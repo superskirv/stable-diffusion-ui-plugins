@@ -16,7 +16,7 @@
 	//Edit below at your own risk.
 	var options="";
 	for(var i=start; i<=end; i++) {
-		if(64*i == 512 || 64*i == 768 || 64*i == 1024) {
+		if(i%4 == 0 && i != 4) {
 			options += '<option value="' + (64*i) + '">*' + (64*i) + '*</option>';
 		} else {
 			options += '<option value="' + (64*i) + '">' + (64*i) + '</option>';
