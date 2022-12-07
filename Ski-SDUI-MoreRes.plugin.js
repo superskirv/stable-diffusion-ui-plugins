@@ -22,7 +22,7 @@
 			options += '<option value="' + (64*i) + '">' + (64*i) + '</option>';
 		}
 	}
-    document.getElementById('width').innerHTML = options;
-    document.getElementById('height').innerHTML = options;
+    document.getElementById('width').innerHTML += options;
+    document.getElementById('height').innerHTML += options;
 
 })();
