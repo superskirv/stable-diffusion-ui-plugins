@@ -7,14 +7,34 @@
 
 (function () {
   //Comment out which ones you dont want to run.
-  all_Resolutions('append'); //Will override or append current resolutions in lists
-  // custom_scaled_Resolutions( Type of images, Max Size to match, Ratio(big side divided by little side), closeness percent );
-  custom_scaled_Resolutions('wide',2048,1.25,0.03); //Will Append to list of current resolutions.
-  //'wide' images, or 'tall' images
-  //DO NOT EDIT BELOW
+  all_Resolutions('override'); //Will 'override' or 'append' current resolutions in lists
+  // custom_scaled_Resolutions( Max Size to match, Ratio(side divided by side), closeness percent, Min Size );
+  custom_scaled_Resolutions(2048,768/512,0.03); //Will Append to the list of current resolutions.
+  // All options are optional.
 
-  function all_Resolutions(mode) {
-    //This will Override the Resolutions for the the drop down box.
+  //---------------------------DO NOT EDIT BELOW------------------------------
+
+  //Notes:
+  //  MAX SIZE:
+  //    This is the max size it will try to match for the given ratio.
+  //  RATIO:
+  //    You can type the resolution math into the ratio, or you can type the answer in.
+  //    EX 1: 768/512 OR 1.5
+  //    EX 2: 512/768 OR .666
+  //  CLOSENESS:
+  //    This is how close the resolution it found can be to the one you want.
+  //    If Pair is exactly the same ratio, A '*' will appear before the "Pair #"
+  //    EX 1: .03 is within 3 percent, so the ratio must be above 1.455 and below 1.545 (More Results)
+  //    EX 2: 0 is ZERO. This will only match ratio's that are what you want. (Less results)
+  //  MIN SIZE:
+  //    The Smallest number of pixels to output a pair, reduces smaller resolution that match the ratio.
+  //    Formula is SIDE PLUS SIDE EQUALS (MIN SIZE), 8+8=16, or (8*64) + (8*64) = (16*64), or 512 + 512 = 1024
+  //    Ex 1: 16, will allow 448x576, or 384x640, or 704x320, if the pair matches the ratio.
+  //    Ex 2: 8, will allow 256x256, or 128x384, or 192x320, if the pair matches the ratio.
+
+  //---------------------------DO NOT EDIT BELOW------------------------------
+  function all_Resolutions(mode = 'append') {
+    //This will Override or Append the Resolutions for the the drop down box.
 
 	  //These numbers are multiplied by 64
     //Starts at 2 * 64 = 128
@@ -39,7 +59,7 @@
       document.getElementById('height').innerHTML = options;
     }
   }
-  function custom_scaled_Resolutions(side='width', size=2048, size_ratio=1.25, closeness=0.03) {
+  function custom_scaled_Resolutions(size=2048, size_ratio=1.25, closeness=0.03, min_size = 15) {
 	  //This will Append Resolutions for the given side to the drop down box.
 
     //At some point I need to figure out how to add a button to the GUI and have these option pop up in a special menu.
@@ -65,47 +85,26 @@
     var pair = 1; //Used to help user pair up compatible resolutions
     var now = 1; //Used to reduce the math
     var num_loops = 0; //Current loop count
-    //finds all compatible'ish resolutions for given side, equal to or below size given.
-    if(side == 'wide') {
-      for(let i=start; i<=end; i++) {
+    //finds all compatible'ish resolutions for given ratio, equal to or below max size given.
+    for(let i=start; i<=end; i++) {
+      if(num_loops > max){ break; } //prevents infinity loops
+      for(let j=start; j<=end; j++) {
+        num_loops++;
         if(num_loops > max){ break; } //prevents infinity loops
-        for(let j=start; j<=end; j++) {
-          num_loops++;
-          if(num_loops > max){ break; } //prevents infinity loops
-          //Speeding up search
-          now = (((i*64) / (j*64)) / size_ratio);
-          //Reduces the number of smaller resolution pairs. (i + J, or 8+8= 512x512 image size, 7+9 = 448x576, etc...)
-          if( i + j >= 14) {
-            if ( now >= (1-closeness) ) {
-              if( now <= (1+closeness) ) {
+        //Speeding up search
+        now = (((i*64) / (j*64)) / size_ratio);
+        //Reduces the number of smaller resolution pairs. (i + J, or 8+8= 512x512 image size, 7+9 = 448x576, etc...)
+        if( i + j >= min_size) {
+          if ( now >= (1-closeness) ) {
+            if( now <= (1+closeness) ) {
+              if(now == 1) {
+                options_w += '<option value="' + (64*i) + '">-*Pair ' + pair + "-" + (64*i) + '-</option>';
+                options_h += '<option value="' + (64*j) + '">-*Pair ' + pair + "-" + (64*j) + '-</option>';
+              } else {
                 options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
                 options_h += '<option value="' + (64*j) + '">-Pair ' + pair + "-" + (64*j) + '-</option>';
-                pair++;
               }
-            }
-          }
-        }
-      }
-    }
-    if(side == 'tall') {
-       //This does the math for the opposite, might be redundant... still testing... probably.
-      for(var i=start; i<=end; i++) {
-        if(num_loops > max){ break; } //prevents infinity loops
-        for(var j=start; j<=end; j++) {
-          for(let j=start; j<=end; j++) {
-            num_loops++;
-            if(num_loops > max){ break; } //prevents infinity loops
-            //Speeding up search
-            now = (((i*64) / (j*64)) / size_ratio);
-            //Reduces the number of smaller resolution pairs.
-            if( i + j >= 14) {
-              if ( now >= (1-closeness) ) {
-                if( now <= (1+closeness) ) {
-                  options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
-                  options_h += '<option value="' + (64*j) + '">-Pair ' + pair + "-" + (64*j) + '-</option>';
-                  pair++;
-                }
-              }
+              pair++;
             }
           }
         }
