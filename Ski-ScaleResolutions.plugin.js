@@ -6,22 +6,14 @@
 // ==/UserScript==
 
 (function () {
-  console.log("Loading ScaleResolutions 0.1");
-
   //Comment out which ones you dont want to run.
-  all_Resolutions(); //Will override current resolutions
-  //--!!--
-  //Edit settings starting on Line 50 to change scaled pairs
-  //--!!--
-  custom_scaled_Resolutions(); //Will Append to list of current resolutions.
+  all_Resolutions(); //Will override all current resolutions in lists
+  // custom_scaled_Resolutions( Type of images, Max Size to match, Ratio(big side divided by little side), closeness percent );
+  custom_scaled_Resolutions('wide',2048,1.25,0.03); //Will Append to list of current resolutions.
+  //'wide' images, or 'tall' images
+  //DO NOT EDIT BELOW
 
-  //In the future you will be able to change the settings in this list. But I havent figured it out yet.
-  //For now you need to edit these in the function manually.
-  //custom_scaled_Resolutions('width',2048,1.25,0.03);
-
-  //DO NOT EDIT BELOW UNLESS DIRECTED.
-
-  function all_Resolutions(side, size, scale, closeness) {
+  function all_Resolutions() {
     //This will Override the Resolutions for the the drop down box.
 
 	  //These numbers are multiplied by 64
@@ -42,24 +34,10 @@
     document.getElementById('width').innerHTML = options;
     document.getElementById('height').innerHTML = options;
   }
-  function custom_scaled_Resolutions() {
+  function custom_scaled_Resolutions(side='width', size=2048, size_ratio=1.25, closeness=0.03) {
 	  //This will Append Resolutions for the given side to the drop down box.
 
     //At some point I need to figure out how to add a button to the GUI and have these option pop up in a special menu.
-
-    // side, size, scale, closeness
-    // 'width',2048,1.25,0.03
-
-    //----------------------EDIT THESE TO CHANGE THE SCALED PAIRS--------
-    //'width' = Wide Images, or 'height' = Tall Images
-    var side = 'width';
-    //Max Size of the side Picked.
-    var size = 2048 //Will be automatically rounded to nearest 64
-    //Ratio Fraction Big/Small, or Selected Side/Other Side
-    var size_ratio = 1.777
-    //Close Enough factor in percent, 0=disabled, Default = 0.03
-    var closeness = 0.03
-    //----------------------STOP EDITING BELOW THIS LINE!----------------
 
     //This should force incorrect numbers to be a multiple of the closest 64 set.
     if (size % 64 != 0) {
@@ -83,7 +61,7 @@
     var now = 1; //Used to reduce the math
     var num_loops = 0; //Current loop count
     //finds all compatible'ish resolutions for given side, equal to or below size given.
-    if(side == 'width') {
+    if(side == 'wide') {
       for(let i=start; i<=end; i++) {
         if(num_loops > max){ break; } //prevents infinity loops
         for(let j=start; j<=end; j++) {
@@ -104,7 +82,7 @@
         }
       }
     }
-    if(side == 'height') {
+    if(side == 'tall') {
        //This does the math for the opposite, might be redundant... still testing... probably.
       for(var i=start; i<=end; i++) {
         if(num_loops > max){ break; } //prevents infinity loops
@@ -133,7 +111,7 @@
       //options_w += '<option value="128">-Plugin Failed w-</option>';
       //options_h += '<option value="128">-Plugin Failed h-</option>';
     //}
-    
+
     document.getElementById('width').innerHTML += options_w;
     document.getElementById('height').innerHTML += options_h;
   }
