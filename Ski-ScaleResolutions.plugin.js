@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         ScaleResolutions
-// @version      0.4
+// @version      0.7a
 // @description  Show only approximate resolutions for set scale.
 // @author       Super.Skirv
 // ==/UserScript==
@@ -29,7 +29,7 @@
   //  CLOSENESS:
   //    This is how close the resolution it found can be to the one you want.
   //    If Pair is exactly the same ratio, A '*' will appear before the "Pair #"
-  //    EX 1: .03 is within 3 percent, so the ratio must be above 1.455 and below 1.545 (More Results)
+  //    EX 1: .03 is within 3 percent, so for the ratio 1.5 it must be above 1.455 and below 1.545 (More Results)
   //    EX 2: 0 is ZERO. This will only match ratio's that are what you want. (Less results)
   //  MIN SIZE:
   //    The Smallest number of pixels to output a pair, reduces smaller resolution that match the ratio.
@@ -39,22 +39,22 @@
 
   //---------------------------DO NOT EDIT BELOW------------------------------
   function all_Resolutions(mode = 'append', size = 2048) {
-    //This will Override or Append the Resolutions for the the drop down box.
+    //This will 'override' or 'append' the Resolutions for the the drop down box.
     if (size % 64 != 0) {
       //If remaining numbers are greater than zero, fix it.
       if(size % 64 >= 32){
         //if More than 32 over a multiple of 64, find and add the remaining
-        size += 64-(size % 64);
+        size += 64-(size%64);
       } else {
         //if Less than 32 over a multiple of 64, subtract the remaining
-        size -= size % 64;
+        size -= size%64;
       }
     }
 	  //These numbers are multiplied by 64
     //Starts at 2 * 64 = 128
 	  var start = 2
     //Ends at 32 * 64 = 2048 //36 * 64 = 2304
-	  var end = size % 64
+	  var end = size/64;
 
 	  //Edit below at your own risk.
 	  var options="";
@@ -73,7 +73,7 @@
       document.getElementById('height').innerHTML = options;
     }
   }
-  function custom_scaled_Resolutions(mode='append', size=2048, size_ratio=1.25, closeness=0.03, min_size = 15) {
+  function custom_scaled_resolutions( mode = 'append', size = 2048, size_ratio = 1.25, closeness = 0.03, min_size = 15) {
 	  //This will Append Resolutions for the given side to the drop down box.
 
     //At some point I need to figure out how to add a button to the GUI and have these option pop up in a special menu.
@@ -88,7 +88,6 @@
         //if Less than 32 over a multiple of 64, subtract the remaining
         size -= size % 64;
       }
-
     }
     var options_w=""; //The new width resolutions to add
     var options_h=""; //The new height resolutions to add
@@ -130,12 +129,12 @@
       //options_h += '<option value="128">-Plugin Failed h-</option>';
     //}
 
-    if(mode == 'append') {
-      document.getElementById('width').innerHTML += options_w;
-      document.getElementById('height').innerHTML += options_h;
-    } else {
+    if(mode == 'override') {
       document.getElementById('width').innerHTML = options_w;
       document.getElementById('height').innerHTML = options_h;
+    } else {
+      document.getElementById('width').innerHTML += options_w;
+      document.getElementById('height').innerHTML += options_h;
     }
   }
 })();
