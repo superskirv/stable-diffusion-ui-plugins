@@ -61,60 +61,45 @@
     var closeness = 0.03
     //----------------------STOP EDITING BELOW THIS LINE!----------------
 
-    //console.log("LOG INITIAL: size: ",size);
     //This should force incorrect numbers to be a multiple of the closest 64 set.
     if (size % 64 != 0) {
       //If remaining numbers are greater than zero, fix it.
       if(size % 64 >= 32){
         //if More than 32 over a multiple of 64, find and add the remaining
         size += 64-(size % 64);
-        //console.log("LOG CHANGE: size up: ",size);
       } else {
         //if Less than 32 over a multiple of 64, subtract the remaining
         size -= size % 64;
-        //console.log("LOG CHANGE: size down: ",size);
       }
 
     }
-    var options_w="";
-    var options_h="";
-    var start = 2
-    var end = size/64
-    var max = end*end
-    //console.log("LOG: START/STOP/loops: ", start, end, max);
-    //Used to help user pair up compatible resolutions
-    var pair = 1;
-      var last = 1;
-    var now = 1;
-    var num_loops = 0;
+    var options_w=""; //The new width resolutions to add
+    var options_h=""; //The new height resolutions to add
+    var start = 2 //Used to start the loop
+    var end = size/64 //Used to end the loop
+    var max = end*end //Used to Break the loops if it goes on to long.
+
+    var pair = 1; //Used to help user pair up compatible resolutions
+    var now = 1; //Used to reduce the math
+    var num_loops = 0; //Current loop count
     //finds all compatible'ish resolutions for given side, equal to or below size given.
     if(side == 'width') {
       for(let i=start; i<=end; i++) {
-        //console.log("Log A: Now Loop: (i/j) ", i*64, j*64, num_loops);
         if(num_loops > max){ break; } //prevents infinity loops
         for(let j=start; j<=end; j++) {
           num_loops++;
-          //console.log("Log B: Now Loop: (i/j) ", i*64, j*64, num_loops);
           if(num_loops > max){ break; } //prevents infinity loops
           //Speeding up search
           now = (((i*64) / (j*64)) / size_ratio);
-          //console.log("Log: Test: (now/last) ", now, last);
           //Reduces the number of smaller resolution pairs. (i + J, or 8+8= 512x512 image size, 7+9 = 448x576, etc...)
           if( i + j >= 16) {
             if ( now >= (1-closeness) ) {
-                //console.log("Log: Success1: (now/closeness) ", now, 1-closeness);
               if( now <= (1+closeness) ) {
-                //console.log("Log: Success2: (now/closeness) ", now, 1+closeness);
                 options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
                 options_h += '<option value="' + (64*j) + '">-Pair ' + pair + "-" + (64*j) + '-</option>';
                 pair++;
-              } else {
-                //console.log("Log: Failed2: (now/closeness) ", now, 1+closeness);
               }
-            } else {
-              //console.log("Log: Failed1: (now/closeness) ", now, 1-closeness);
             }
-            last = now;
           }
         }
       }
@@ -122,42 +107,33 @@
     if(side == 'height') {
        //This does the math for the opposite, might be redundant... still testing... probably.
       for(var i=start; i<=end; i++) {
-        //console.log("Log A: Now Loop: (i/j) ", i, j, num_loops);
         if(num_loops > max){ break; } //prevents infinity loops
         for(var j=start; j<=end; j++) {
           for(let j=start; j<=end; j++) {
             num_loops++;
-            //console.log("Log B: Now Loop: (i/j) ", i*64, j*64, num_loops);
             if(num_loops > max){ break; } //prevents infinity loops
             //Speeding up search
             now = (((i*64) / (j*64)) / size_ratio);
-            //console.log("Log: Test: (now/last) ", now, last);
             //Reduces the number of smaller resolution pairs.
             if( i + j >= 16) {
               if ( now >= (1-closeness) ) {
-                  //console.log("Log: Success1: (now/closeness) ", now, 1-closeness);
                 if( now <= (1+closeness) ) {
-                  //console.log("Log: Success2: (now/closeness) ", now, 1+closeness);
                   options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
                   options_h += '<option value="' + (64*j) + '">-Pair ' + pair + "-" + (64*j) + '-</option>';
                   pair++;
-                } else {
-                  //console.log("Log: Failed2: (now/closeness) ", now, 1+closeness);
                 }
-              } else {
-                //console.log("Log: Failed1: (now/closeness) ", now, 1-closeness);
               }
-              last = now;
             }
           }
         }
       }
     }
-    if(pair == 1) {
-      options_w += '<option value="128">-Plugin Failed w-</option>';
-      options_h += '<option value="128">-Plugin Failed h-</option>';
-    }
-	  //Reference only... need to delete...
+    //if(pair == 1) {
+      //Informs the Users that the plugin failed to find compatible settings with the current settings.
+      //options_w += '<option value="128">-Plugin Failed w-</option>';
+      //options_h += '<option value="128">-Plugin Failed h-</option>';
+    //}
+    
     document.getElementById('width').innerHTML += options_w;
     document.getElementById('height').innerHTML += options_h;
   }
