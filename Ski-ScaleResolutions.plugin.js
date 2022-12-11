@@ -7,13 +7,13 @@
 
 (function () {
   //Comment out which ones you dont want to run.
-  all_Resolutions(); //Will override all current resolutions in lists
+  all_Resolutions('append'); //Will override or append current resolutions in lists
   // custom_scaled_Resolutions( Type of images, Max Size to match, Ratio(big side divided by little side), closeness percent );
   custom_scaled_Resolutions('wide',2048,1.25,0.03); //Will Append to list of current resolutions.
   //'wide' images, or 'tall' images
   //DO NOT EDIT BELOW
 
-  function all_Resolutions() {
+  function all_Resolutions(mode) {
     //This will Override the Resolutions for the the drop down box.
 
 	  //These numbers are multiplied by 64
@@ -31,8 +31,13 @@
 		  	options += '<option value="' + (64*i) + '">' + (64*i) + '</option>';
 	  	}
   	}
-    document.getElementById('width').innerHTML = options;
-    document.getElementById('height').innerHTML = options;
+    if(mode == 'append') {
+      document.getElementById('width').innerHTML += options;
+      document.getElementById('height').innerHTML += options;
+    } else {
+      document.getElementById('width').innerHTML = options;
+      document.getElementById('height').innerHTML = options;
+    }
   }
   function custom_scaled_Resolutions(side='width', size=2048, size_ratio=1.25, closeness=0.03) {
 	  //This will Append Resolutions for the given side to the drop down box.
@@ -70,7 +75,7 @@
           //Speeding up search
           now = (((i*64) / (j*64)) / size_ratio);
           //Reduces the number of smaller resolution pairs. (i + J, or 8+8= 512x512 image size, 7+9 = 448x576, etc...)
-          if( i + j >= 16) {
+          if( i + j >= 14) {
             if ( now >= (1-closeness) ) {
               if( now <= (1+closeness) ) {
                 options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
@@ -93,7 +98,7 @@
             //Speeding up search
             now = (((i*64) / (j*64)) / size_ratio);
             //Reduces the number of smaller resolution pairs.
-            if( i + j >= 16) {
+            if( i + j >= 14) {
               if ( now >= (1-closeness) ) {
                 if( now <= (1+closeness) ) {
                   options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
