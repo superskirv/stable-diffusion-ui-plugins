@@ -7,20 +7,25 @@
 
 (function () {
   //Comment out which ones you dont want to run.
-  all_Resolutions('override'); //Will 'override' or 'append' current resolutions in lists
-  // custom_scaled_Resolutions( Max Size to match, Ratio(side divided by side), closeness percent, Min Size );
-  custom_scaled_Resolutions(2048,768/512,0.03); //Will Append to the list of current resolutions.
+
+  // all_Resolutions( Mode, Max Resolution );
+  all_Resolutions('override',2048); //Adds all combinations of resolutions in increments of 64.
+  // custom_scaled_Resolutions( Mode, Max Size to match, Ratio(side divided by side), closeness percent, Min Size );
+  custom_scaled_Resolutions('append',2048,768/512,0.03);
   // All options are optional.
 
   //---------------------------DO NOT EDIT BELOW------------------------------
 
   //Notes:
+  //  MODE:
+  //    This option will 'override' or 'append' results to the resolution list.
   //  MAX SIZE:
   //    This is the max size it will try to match for the given ratio.
   //  RATIO:
   //    You can type the resolution math into the ratio, or you can type the answer in.
   //    EX 1: 768/512 OR 1.5
   //    EX 2: 512/768 OR .666
+  //    EX 3: 512/512 OR 1
   //  CLOSENESS:
   //    This is how close the resolution it found can be to the one you want.
   //    If Pair is exactly the same ratio, A '*' will appear before the "Pair #"
@@ -33,14 +38,23 @@
   //    Ex 2: 8, will allow 256x256, or 128x384, or 192x320, if the pair matches the ratio.
 
   //---------------------------DO NOT EDIT BELOW------------------------------
-  function all_Resolutions(mode = 'append') {
+  function all_Resolutions(mode = 'append', size = 2048) {
     //This will Override or Append the Resolutions for the the drop down box.
-
+    if (size % 64 != 0) {
+      //If remaining numbers are greater than zero, fix it.
+      if(size % 64 >= 32){
+        //if More than 32 over a multiple of 64, find and add the remaining
+        size += 64-(size % 64);
+      } else {
+        //if Less than 32 over a multiple of 64, subtract the remaining
+        size -= size % 64;
+      }
+    }
 	  //These numbers are multiplied by 64
     //Starts at 2 * 64 = 128
 	  var start = 2
     //Ends at 32 * 64 = 2048 //36 * 64 = 2304
-	  var end = 36
+	  var end = size % 64
 
 	  //Edit below at your own risk.
 	  var options="";
@@ -59,7 +73,7 @@
       document.getElementById('height').innerHTML = options;
     }
   }
-  function custom_scaled_Resolutions(size=2048, size_ratio=1.25, closeness=0.03, min_size = 15) {
+  function custom_scaled_Resolutions(mode='append', size=2048, size_ratio=1.25, closeness=0.03, min_size = 15) {
 	  //This will Append Resolutions for the given side to the drop down box.
 
     //At some point I need to figure out how to add a button to the GUI and have these option pop up in a special menu.
@@ -116,7 +130,12 @@
       //options_h += '<option value="128">-Plugin Failed h-</option>';
     //}
 
-    document.getElementById('width').innerHTML += options_w;
-    document.getElementById('height').innerHTML += options_h;
+    if(mode == 'append') {
+      document.getElementById('width').innerHTML += options_w;
+      document.getElementById('height').innerHTML += options_h;
+    } else {
+      document.getElementById('width').innerHTML = options_w;
+      document.getElementById('height').innerHTML = options_h;
+    }
   }
 })();
