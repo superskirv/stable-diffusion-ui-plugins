@@ -10,9 +10,9 @@
 
   // all_Resolutions( Mode, Max Resolution );
   all_Resolutions('override',2048); //Adds all combinations of resolutions in increments of 64.
-  // custom_scaled_Resolutions( Mode, Max Size to match, Ratio(side divided by side), closeness percent, Min Size );
-  custom_scaled_Resolutions('append',2048,768/512,0.03);
-  // All options are optional.
+  // custom_scaled_resolutions( Mode, Max Size to match, Ratio(side divided by side), closeness percent, Min Size );
+  custom_scaled_resolutions('append',2048,768/512,0.03,14);
+  // All options are optional. You can run as many times as you want with different setting.
 
   //---------------------------DO NOT EDIT BELOW------------------------------
 
@@ -23,19 +23,21 @@
   //    This is the max size it will try to match for the given ratio.
   //  RATIO:
   //    You can type the resolution math into the ratio, or you can type the answer in.
-  //    EX 1: 768/512 OR 1.5
-  //    EX 2: 512/768 OR .666
-  //    EX 3: 512/512 OR 1
+  //    EX 1: 768/512 OR 3/2 OR 1.5  //Instead of typing 3:2 ratio, replace the ':' with a '/' making it 3/2
+  //    EX 2: 512/768 OR 2/3 OR .666 //Why bother with the math if you know, you know type .666.
+  //    EX 3: 512/512 OR 1/1 OR 1
   //  CLOSENESS:
   //    This is how close the resolution it found can be to the one you want.
-  //    If Pair is exactly the same ratio, A '*' will appear before the "Pair #"
+  //    If Pair is exactly the same ratio, A '*' will appear before the Tag "Pair #"
   //    EX 1: .03 is within 3 percent, so for the ratio 1.5 it must be above 1.455 and below 1.545 (More Results)
-  //    EX 2: 0 is ZERO. This will only match ratio's that are what you want. (Less results)
+  //    EX 2: 0 is ZERO. This will only match ratio's that are EXACTLY what you want. (Less results), None if you set min and max to restrictive.
   //  MIN SIZE:
   //    The Smallest number of pixels to output a pair, reduces smaller resolution that match the ratio.
   //    Formula is SIDE PLUS SIDE EQUALS (MIN SIZE), 8+8=16, or (8*64) + (8*64) = (16*64), or 512 + 512 = 1024
-  //    Ex 1: 16, will allow 448x576, or 384x640, or 704x320, if the pair matches the ratio.
-  //    Ex 2: 8, will allow 256x256, or 128x384, or 192x320, if the pair matches the ratio.
+  //    Ex 1: 16, will allow 448x576(7+9), or 384x640(6+10), or 704x320(11+5), if the pair matches the ratio.
+  //    Ex 2: 8, will allow 256x256(4+4), or 128x384(2+6), or 192x320(3+5), if the pair matches the ratio.
+  //    Generally its best to leave this above 12.
+  //    If set correctly you can limit the results to just a few Pairs, which will make the drop down smaller.
 
   //---------------------------DO NOT EDIT BELOW------------------------------
   function all_Resolutions(mode = 'append', size = 2048) {
@@ -104,16 +106,16 @@
       for(let j=start; j<=end; j++) {
         num_loops++;
         if(num_loops > max){ break; } //prevents infinity loops
-        //Speeding up search
+        //Speeding up search, reducing math calcs
         now = (((i*64) / (j*64)) / size_ratio);
         //Reduces the number of smaller resolution pairs. (i + J, or 8+8= 512x512 image size, 7+9 = 448x576, etc...)
         if( i + j >= min_size) {
           if ( now >= (1-closeness) ) {
             if( now <= (1+closeness) ) {
-              if(now == 1) {
+              if(now == 1) { //Exact Match
                 options_w += '<option value="' + (64*i) + '">-*Pair ' + pair + "-" + (64*i) + '-</option>';
                 options_h += '<option value="' + (64*j) + '">-*Pair ' + pair + "-" + (64*j) + '-</option>';
-              } else {
+              } else { //Close Enough Match
                 options_w += '<option value="' + (64*i) + '">-Pair ' + pair + "-" + (64*i) + '-</option>';
                 options_h += '<option value="' + (64*j) + '">-Pair ' + pair + "-" + (64*j) + '-</option>';
               }
